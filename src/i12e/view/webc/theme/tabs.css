@@ -1,0 +1,21 @@
+cx-tabs::part(tablist) {
+  gap: 1px;
+}
+
+cx-tabs::part(tab) {
+  padding: 4px 8px;
+  background: #ddd;
+  border-radius: 4px 4px 0 0;
+}
+
+cx-tabs::part(tab):hover {
+  background: #dedede;
+}
+
+cx-tabs::part(tab)[aria-selected="true"] {
+  background: #eee;
+}
+
+cx-tabs::part(tabpanel) {
+  background: #ccc;
+}
