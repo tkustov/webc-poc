@@ -3,3 +3,11 @@
 #scroll-test {
   max-height: 200px;
 }
+
+cx-scrollpane::part(track) {
+  background: #eee;
+}
+
+cx-scrollpane::part(slider) {
+  background: #aaa;
+}
