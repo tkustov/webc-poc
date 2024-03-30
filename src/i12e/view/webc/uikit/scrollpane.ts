@@ -6,12 +6,12 @@ const template = create_template(`
     <div id="content"><slot></slot></div>
   </div>
   <div id="vtrack" part="track">
-    <div id="vslider" part="slider" draggable="true">
+    <div id="vslider" part="slider">
       <slot name="vslider"></slot>
     </div>
   </div>
   <div id="htrack" part="track">
-    <div id="hslider" part="slider" draggable="true">
+    <div id="hslider" part="slider">
       <slot name="hslider"></slot>
     </div>
   </div>
@@ -94,17 +94,7 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
     this.#resizeObserver.observe(this.#content);
     this.addEventListener('wheel', this.#handleWheel, { passive: true });
     this.addEventListener('mousedown', this.#handleMouseDown, { passive: true });
-    this.#vslider.addEventListener('dragstart', (event) => {
-      event.dataTransfer!.effectAllowed = 'move';
-      event.dataTransfer!.dropEffect = 'move';
-    });
-    this.#vslider.addEventListener('drag', (event) => {
-      event.dataTransfer!.dropEffect = 'move';
-      console.log(event);
-    });
-    this.#vslider.addEventListener('drop', (event) => {
-      console.log(event);
-    });
+    this.#vslider.addEventListener('mousedown', this.#handleVsliderDown, { passive: true });
   }
 
   scrollBy(...args: [x: number, y: number] | [options?: ScrollToOptions]): void {
@@ -149,6 +139,11 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
   };
 
   #handleMouseDown = (event: MouseEvent) => {
+    // TODO: handle wheel tilt to horizontal scroll
+    console.log(event);
+  };
+
+  #handleVsliderDown = (event: MouseEvent) => {
     console.log(event);
   };
 }
