@@ -93,7 +93,7 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
   connectedCallback(): void {
     this.#resizeObserver.observe(this);
     this.#resizeObserver.observe(this.#content);
-    this.addEventListener('wheel', this.#handleWheel, { passive: true });
+    this.addEventListener('wheel', this.#handleWheel, { passive: false });
     this.addEventListener('mousedown', this.#handleWheelTilt, { passive: true });
     this.#vslider.addEventListener('mousedown', this.#handleVsliderDown, { passive: true });
   }
@@ -145,6 +145,8 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
   };
 
   #handleWheel = (event: WheelEvent) => {
+    if (event.defaultPrevented) return;
+    event.preventDefault();
     this.scrollBy({
       behavior: 'instant',
       top: event.deltaY

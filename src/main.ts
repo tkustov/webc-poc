@@ -37,7 +37,22 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <p>Scroll content</p>
     <p>Scroll content</p>
     <p>Scroll content</p>
-    <p>Scroll content</p>
+    <cx-scrollpane id="scroll-test-inner">
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+      <p>Scroll content</p>
+    </cx-scollpane>
     <p>Scroll content</p>
     <p>Scroll content</p>
     <p>Scroll content</p>

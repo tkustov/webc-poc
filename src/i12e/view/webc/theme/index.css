@@ -4,6 +4,12 @@
   max-height: 200px;
 }
 
+#scroll-test-inner {
+  max-height: 150px;
+  max-width: 50px;
+  background: lightgray;
+}
+
 cx-scrollpane {
   --cx-scrollpane-track-size: 8px;
 }
