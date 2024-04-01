@@ -4,10 +4,28 @@
   max-height: 200px;
 }
 
+cx-scrollpane {
+  --cx-scrollpane-track-size: 8px;
+}
+
 cx-scrollpane::part(track) {
-  background: #eee;
+  background: rgba(0 0 0 / 0);
+  border-radius: calc(var(--cx-scrollpane-track-size) / 2);
+  transition: background-color 48ms linear;
 }
 
 cx-scrollpane::part(slider) {
-  background: #aaa;
+  background: rgba(0 0 0 / 0);
+  border-radius: calc(var(--cx-scrollpane-track-size) / 2);
+  transition: background-color 48ms linear;
+}
+
+cx-scrollpane:hover::part(track),
+cx-scrollpane[scrolling]::part(track) {
+  background: rgba(0 0 0 / 0.1);
+}
+
+cx-scrollpane:hover::part(slider),
+cx-scrollpane[scrolling]::part(slider) {
+    background: rgba(0 0 0 / 0.5);
 }

@@ -75,6 +75,7 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
   #hslider: HTMLElement;
   #maxScrollTop: number = 0;
   #maxScrollLeft: number = 0;
+  #dragState?: SliderDragState;
 
   constructor() {
     super();
@@ -93,7 +94,7 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
     this.#resizeObserver.observe(this);
     this.#resizeObserver.observe(this.#content);
     this.addEventListener('wheel', this.#handleWheel, { passive: true });
-    this.addEventListener('mousedown', this.#handleMouseDown, { passive: true });
+    this.addEventListener('mousedown', this.#handleWheelTilt, { passive: true });
     this.#vslider.addEventListener('mousedown', this.#handleVsliderDown, { passive: true });
   }
 
@@ -121,10 +122,22 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
         this.#pane.style.setProperty('height', `${entry.contentRect.height}px`);
       }
       if (entry.target === this.#content) {
-        const vsize = this.clientHeight / this.#pane.scrollHeight * (this.#vtrack.clientHeight);
-        const hsize = this.clientWidth / this.#pane.scrollWidth * (this.#htrack.clientWidth);
-        this.#vslider.style.setProperty('height', `${vsize}px`);
-        this.#hslider.style.setProperty('width', `${hsize}px`);
+        const vRatio = this.clientHeight / this.#pane.scrollHeight;
+        const hRatio = this.clientWidth / this.#pane.scrollWidth;
+        const vsize = vRatio * (this.#vtrack.clientHeight);
+        const hsize = hRatio * (this.#htrack.clientWidth);
+        this.#vslider.style.setProperty('height', `${Math.ceil(vsize)}px`);
+        this.#hslider.style.setProperty('width', `${Math.ceil(hsize)}px`);
+        if (Math.abs(vRatio - 1) < 0.0001) {
+          this.#vtrack.style.setProperty('display', 'none');
+        } else {
+          this.#vtrack.style.removeProperty('display');
+        }
+        if (Math.abs(hRatio - 1) < 0.0001) {
+          this.#htrack.style.setProperty('display', 'none');
+        } else {
+          this.#htrack.style.removeProperty('display');
+        }
         this.#maxScrollLeft = (this.#pane.scrollWidth - this.#pane.clientWidth) / this.#pane.scrollWidth;
         this.#maxScrollTop = (this.#pane.scrollHeight - this.#pane.clientHeight) / this.#pane.scrollHeight;
       }
@@ -138,14 +151,52 @@ export class Scrollpane extends HTMLElement implements CustomElementLifecycle {
     });
   };
 
-  #handleMouseDown = (event: MouseEvent) => {
+  #handleWheelTilt = (event: MouseEvent) => {
     // TODO: handle wheel tilt to horizontal scroll
-    console.log(event);
+    // console.log(event);
   };
 
   #handleVsliderDown = (event: MouseEvent) => {
-    console.log(event);
+    const vtRect = this.#vtrack.getBoundingClientRect();
+    const vsRect = this.#vslider.getBoundingClientRect();
+    this.setAttribute('scrolling', 'drag-slider');
+    this.#dragState = {
+      axis: 'y',
+      start: event.clientY,
+      min: vtRect.top,
+      max: vtRect.bottom - vsRect.height,
+      pivot: event.clientY - vsRect.top
+    };
+    window.addEventListener('mousemove', this.#handleVsliderDrag, { passive: false });
+    window.addEventListener('mouseup', this.#handleVsliderDrop, { passive: true });
+    window.addEventListener('blur', this.#handleVsliderDrop, { passive: true });
+  };
+
+  #handleVsliderDrag = (event: MouseEvent) => {
+    if (!this.#dragState || this.#dragState.axis !== 'y') return;
+    event.preventDefault();
+    const sliderTop = Math.max(this.#dragState.min, Math.min(event.clientY - this.#dragState.pivot, this.#dragState.max)) - this.#dragState.min;
+    this.#vslider.style.setProperty('top', `${sliderTop}px`);
+    this.#pane.scrollTo({
+      behavior: 'instant',
+      top: (this.#pane.scrollHeight - this.#pane.clientHeight) * sliderTop / (this.#dragState.max - this.#dragState.min)
+    });
+  };
+
+  #handleVsliderDrop = () => {
+    this.removeAttribute('scrolling');
+    window.removeEventListener('mousemove', this.#handleVsliderDrag);
+    window.removeEventListener('mouseup', this.#handleVsliderDrop);
+    window.removeEventListener('blur', this.#handleVsliderDrop);
   };
 }
 
 define_webc('cx-scrollpane', Scrollpane);
+
+interface SliderDragState {
+  axis: 'y' | 'x';
+  start: number;
+  pivot: number;
+  min: number;
+  max: number;
+}
